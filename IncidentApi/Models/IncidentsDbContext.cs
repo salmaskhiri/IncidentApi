@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using IncidentApi.Models;
 
-namespace IncidentApi.Modelsss
+namespace IncidentApi.Models
 {
     public class IncidentsDbContext : DbContext
     {
@@ -9,9 +9,9 @@ namespace IncidentApi.Modelsss
             : base(options)
         {
         }
-        public DbSet<IncidentApi.Models.Incident> Incident { get; set; } = default!;
+        public DbSet<IncidentApi.Models.Incident> Incidents { get; set; } = default!;
 
-        // Exemple :
-        // public DbSet<Incident> Incidents { get; set; }
+       
+
     }
 }

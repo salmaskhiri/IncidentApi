@@ -12,8 +12,8 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddDbContext<IncidentsDbContext>(options =>
-options.UseSqlServer(builder.Configuration.
-GetConnectionString("IncidentsConnection")));
+    options.UseSqlServer(builder.Configuration.
+    GetConnectionString("IncidentsConnection")));
 
 var app = builder.Build();
 
@@ -31,3 +31,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+public partial class Program { }
