@@ -22,6 +22,7 @@ namespace AppTests
         [InlineData("MEDIUM")]
         [InlineData("HIGH")]
         [InlineData("CRITICAL")]
+        [Trait("Category", "Unit")]
         public async Task PostIncident_ValidSeverity_ReturnsCreated(string severity)
         {
             var context = GetDbContext();
@@ -42,7 +43,8 @@ namespace AppTests
 
             Assert.Equal(severity, createdIncident.Severity);
             Assert.Equal("OPEN", createdIncident.Status);
-            Assert.NotNull(createdIncident.CreatedAt);
+
+            Assert.NotEqual(default(DateTime), createdIncident.CreatedAt);
         }
     }
 }

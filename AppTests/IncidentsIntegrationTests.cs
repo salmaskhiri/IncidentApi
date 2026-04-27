@@ -49,15 +49,14 @@ namespace AppTests
                 Severity = "MEDIUM"
             };
 
-            // 1. CREATE
             var postResponse = await _client.PostAsJsonAsync("/api/incidents", incident);
             postResponse.EnsureSuccessStatusCode();
 
-            var created = await postResponse.Content.ReadFromJsonAsync<Incident>();
+            await Task.Delay(1000); // 🔥 important CI Docker SQL Server
 
+            var created = await postResponse.Content.ReadFromJsonAsync<Incident>();
             Assert.NotNull(created);
 
-            // 2. GET ALL (bonne route)
             var response = await _client.GetAsync("/api/incidents/get-all");
             response.EnsureSuccessStatusCode();
 

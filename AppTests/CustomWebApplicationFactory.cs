@@ -1,47 +1,45 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using IncidentApi.Models; // ⚠️ adapte selon ton namespace réel
+using IncidentApi.Models;
 
-namespace AppTests
+public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        builder.UseEnvironment("Testing");
+
+        builder.ConfigureServices(services =>
         {
-            builder.UseEnvironment("Testing");
+            // supprimer ancien DbContext
+            var descriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbContextOptions<IncidentsDbContext>));
 
-            builder.ConfigureServices(services =>
-            {
-                // 🔥 Supprimer l'ancien DbContext
-                var descriptor = services.SingleOrDefault(
-                    d => d.ServiceType == typeof(DbContextOptions<IncidentsDbContext>)
-                );
+            if (descriptor != null)
+                services.Remove(descriptor);
 
-                if (descriptor != null)
-                {
-                    services.Remove(descriptor);
-                }
+            // récupérer connection string depuis CI ou appsettings
+            var sp = services.BuildServiceProvider();
+            using var scope = sp.CreateScope();
 
-                // 🔥 Ajouter DbContext avec BD de test
-                services.AddDbContext<IncidentsDbContext>(options =>
-                    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=IncidentDb_Test;Trusted_Connection=True;TrustServerCertificate=True;")
-                );
+            var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-                // 🔥 Construire le provider
-                var sp = services.BuildServiceProvider();
+            var connectionString = configuration.GetConnectionString("IncidentsConnection");
 
-                // 🔥 Initialiser la base de données
-                using (var scope = sp.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<IncidentsDbContext>();
+            // ajouter SQL Server (Docker CI ou local)
+            services.AddDbContext<IncidentsDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
-                    db.Database.EnsureDeleted();
-                    db.Database.EnsureCreated();
-                }
-            });
-        }
+            // rebuild provider
+            var serviceProvider = services.BuildServiceProvider();
+
+            using var scope2 = serviceProvider.CreateScope();
+            var db = scope2.ServiceProvider.GetRequiredService<IncidentsDbContext>();
+
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+        });
     }
 }
