@@ -1,16 +1,15 @@
-﻿using System.Data;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema; // ← à ajouter
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IncidentApi.Models
 {
-    [Table("Incidents")] // <-- correspond au nom exact de la table SQL
+    [Table("Incidents")]
     public class Incident
     {
         public int Id { get; set; }
-        [RegularExpression("LOW|MEDIUM|HIGH|CRITICAL", ErrorMessage = "Invalid severity")]
+
         [Required]
-        [StringLength(30, MinimumLength = 3, ErrorMessage = "erreur")]
+        [StringLength(30, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 30 characters")]
         public string Title { get; set; } = string.Empty;
 
         [Required]
@@ -18,9 +17,10 @@ namespace IncidentApi.Models
         public string Description { get; set; } = string.Empty;
 
         [Required]
+        [RegularExpression("LOW|MEDIUM|HIGH|CRITICAL", ErrorMessage = "Invalid severity")]
         public string Severity { get; set; } = string.Empty;
 
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } = "OPEN";
 
         public DateTime CreatedAt { get; set; }
     }

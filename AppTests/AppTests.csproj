@@ -21,7 +21,9 @@
   <ItemGroup>
     <ProjectReference Include="..\IncidentApi\IncidentApi.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<PackageReference Include="Microsoft.TestPlatform.TestHost" Version="17.14.1" />
+	</ItemGroup>
   <ItemGroup>
     <Using Include="System.Net" />
     <Using Include="Microsoft.Extensions.DependencyInjection" />
